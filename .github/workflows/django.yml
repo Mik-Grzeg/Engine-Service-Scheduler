@@ -27,4 +27,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python backend/GeneratorLosowychSerwisow/manage.py test
+        python backend/ManagementSystem/manage.py test
