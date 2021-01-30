@@ -24,7 +24,7 @@ backend/ManagementSystem/.coverage
 /backend/ManagementSystem/ManagementSystem/local_settings.py
 
 # virtual environment
-backend/venv
+venv/
 
 # db
 backend/ManagementSystem/db.sqlite3
