@@ -29,4 +29,7 @@ jobs:
       env:
         SECRET_KEY: qi^)cd@x)hj2nm=1xw3ky6=_bo@x39wt3$n!f7^nfe=hz69x7t
       run: |
-        python backend/ManagementSystem/manage.py test
+        coverage run --source='.' --omit='venv/*' backend/ManagementSystem/manage.py test backend/ManagementSystem/Users/tests
+    - name: Coverage
+      run: |
+        coverage report
