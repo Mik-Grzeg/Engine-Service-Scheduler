@@ -15,16 +15,17 @@ class UserManager(BaseUserManager):
     Custom user model manager where email address is the unique identifier for authentication instead of username.
     """
 
-    def create_user(self, email, password, **extra_fields):
+    def create_user(self, email, first_name, last_name, work_phone, is_superuser=False):
         """
         Create and save a user with given credentials that are mandatory and extra_fields that are supplementary.
         """
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email, first_name=first_name, last_name=last_name, work_phone=work_phone)
 
         # might throw a ValidationError
-        password_validation.validate_password(password, user)
-        user.set_password(password)
+        if not is_superuser:
+            password = User.objects.make_random_password(length=14)
+            user.set_password(password)
 
         # might throw a ValidationError
         user.clean_fields()
@@ -32,9 +33,13 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email, password,  **extra_fields):
-        user = self.create_user(email, password, **extra_fields)
+    def create_superuser(self, email, password,  first_name, last_name, work_phone):
+        user = self.create_user(email, first_name, last_name, work_phone)
         user.is_superuser = True
+
+        password_validation.validate_password(password, user)
+        user.set_password(password)
+
         user.save(using=self._db)
         return user
 
