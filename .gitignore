@@ -22,6 +22,7 @@ backend/ManagementSystem/.coverage
 .env.test.local
 .env.production.local
 /backend/ManagementSystem/ManagementSystem/local_settings.py
+OLD_VIEWS.py
 
 # virtual environment
 venv/

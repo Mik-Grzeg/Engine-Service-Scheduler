@@ -3,18 +3,38 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.validators import UniqueValidator
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.password_validation import validate_password
 
+User = get_user_model()
 
-class RegisterSerializer(ModelSerializer):
+
+class GroupSerializer(ModelSerializer):
+    permissions = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='codename'
+    )
+    user_set = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='email'
+    )
+
+    class Meta:
+        model = Group
+        fields = ('name', 'permissions', 'user_set')
+
+
+class UserSerializer(ModelSerializer):
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=get_user_model().objects.all())]
+        validators=[UniqueValidator(queryset=User.objects.all())]
        )
     work_phone = serializers.CharField(required=True)
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('email', 'first_name', 'last_name', 'work_phone')
         extra_kwargs = {
             'first_name': {'required': True},
@@ -22,12 +42,12 @@ class RegisterSerializer(ModelSerializer):
         }
 
 
-    def create(self, validated_data):
-        user = get_user_model().objects.create_user(
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            work_phone=validated_data['work_phone'],
+    def create(self):
+        user = User.objects.create_user(
+            email=self.validated_data['email'],
+            first_name=self.validated_data['first_name'],
+            last_name=self.validated_data['last_name'],
+            work_phone=self.validated_data['work_phone'],
         )
 
         return user
@@ -43,41 +63,43 @@ class PasswordSetSerializer(serializers.Serializer):
     password2 = serializers.CharField(required=True, write_only=True)
 
 
-    def __init__(self, *args, **kwargs):
-        """
-        If there was current_password passed then add new field to the serializer.
-        """
-        super(PasswordSetSerializer, self).__init__(*args, **kwargs)
-        current_password = self.context['request'].data.get('current_password')
-        if current_password:
-            self.fields['current_password'] = serializers.CharField(required=True, write_only=True)
-
-    def validate_current_password(self, value):
-        """
-        Checks if current_password is correct.
-        """
-        if not self.instance.check_password(value):
-            raise serializers.ValidationError('Current password is incorrect.')
-        return value
-
     def validate(self, attrs):
         """
         Check if the two given passwords are the same
         and also whether new password isn't the same as the old one.
         """
+
         if attrs['password1'] != attrs['password2']:
             raise serializers.ValidationError('New passwords do not match')
         if self.instance.check_password(attrs['password1']):
             raise serializers.ValidationError('New password can not be the same as the old one.')
         return attrs
 
-    def save(self, instance, validated_data):
-        print(validate_password(validated_data['password1'], instance))
-        instance.set_password(validated_data['password1'])
+    def save(self):
+        """Setting new password after validation"""
+        self.instance.set_password(self.validated_data['password1'])
+        self.instance.save()
 
-        instance.save()
-        return instance
+        return self.instance
 
+class PasswordChangeSerializer(PasswordSetSerializer):
+    """
+    Password change serializer that inherits from PasswordSet,
+    because the only difference is field with old password and its validation.
+    """
+    current_password = serializers.CharField(required=True, write_only=True)
+
+    def validate_current_password(self, value):
+        """
+        Checks if current_password is correct.
+        """
+        self.instance.check_password(value)
+        return value
 
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).count() == 0:
+            raise serializers.ValidationError('We could not find any user with provided email address.')
+        return value

@@ -21,13 +21,11 @@ class SingleUseLinkPermission(BasePermission):
                 Moreover, after changing attributes that are part of
                 the token, it's no longer valid.
         """
-
         # uidb64 and token might be passed as kwargs or as request data
         uidb64, token = view.kwargs.get('uidb64'), view.kwargs.get('token')
         if (uidb64 and token) is None:
             uidb64 = request.data.get('uidb64')
             token = request.data.get('token')
-
         try:
             # If the exception is raised then user could have just been deleted
             # or the uidb64 is wrong.
@@ -35,7 +33,6 @@ class SingleUseLinkPermission(BasePermission):
             user = User.objects.get(pk=uid)
         except AttributeError:
             raise MethodNotAllowed(method='Password reset', detail={'error': True, 'message': 'You can\'t do that'})
-
         if user is not None and default_token_generator.check_token(user, token):
             return True
         raise NotAcceptable({'error': True, 'message': 'That link is broken or it has already been used.'})
