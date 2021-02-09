@@ -7,12 +7,12 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'python --version'
-                sh """pip3 install virtualenv
-                    virtualenv venv
-                    source venv/bin/activate
+                sh 'python --version'                
+                sh """
+                    python3 -m venv venv
+                    . venv/bin/activate
                     pip3 install -r requirements.txt
-                    ${BACKENDPATH}/manage.py test Users/tests/"""
+                    ${BACKENDPATH}/manage.py test ${BACKENDPATH}/Users/tests/"""
 
             }
         }
