@@ -53,7 +53,7 @@ class UserViewSetTest(APITestCase):
 
     def test_user_create(self):
         """User creation test """
-        request = self.factory.post('/auth/user/create/',
+        request = self.factory.post('/auth/user/',
                                     json.dumps(self.valid_regular_user),
                                     content_type='application/json')
         force_authenticate(request, user=self.admin)
@@ -63,7 +63,7 @@ class UserViewSetTest(APITestCase):
 
     def test_invalid_user_create(self):
         """Invalid user creation test"""
-        request = self.factory.post('auth/user/create/',
+        request = self.factory.post('auth/user/',
                                     json.dumps(self.invalid_user),
                                     content_type='application/json')
         force_authenticate(request, user=self.admin)
@@ -78,7 +78,7 @@ class UserViewSetTest(APITestCase):
         user1 = self.User.objects.create_user(**self.valid_regular_user)
         user2 = self.User.objects.create_user(**self.valid_regular_user2)
 
-        request = self.factory.get('auth/user/list/')
+        request = self.factory.get('auth/user/')
         force_authenticate(request, user=self.admin)
         response = UserViewSet.as_view({'get': 'list',})(request)
         user = self.User.objects.get(email=response.data[2].get('email'))
@@ -157,7 +157,6 @@ class UserViewSetTest(APITestCase):
         self.assertListEqual(list(login_response.data), ['refresh', 'access'])
 
         refresh, access = login_response.data.values()
-
         # registering new user
         # add token to request header
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
@@ -201,7 +200,6 @@ class UserViewSetTest(APITestCase):
         self.assertDictEqual(set_password_response.data, {'message': 'Password has been updated successfully.'})
         user.refresh_from_db()
         self.assertTrue(user.check_password(new_password))
-
 
     def test_forgot_password_unverified_user(self):
         user = self.User.objects.create_user(**self.valid_regular_user)
