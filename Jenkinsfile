@@ -8,12 +8,12 @@ pipeline {
         stage('build') {
             steps {
                 sh 'python --version'
-                sh 'virtualenv venv'
-                sh """
+                sh """pip3 install virtualenv
+                    virtualenv venv
                     source venv/bin/activate
                     pip3 install -r requirements.txt
-                """
-                sh '${BACKENDPATH}/manage.py test Users/tests/'
+                    ${BACKENDPATH}/manage.py test Users/tests/"""
+
             }
         }
     }
