@@ -53,7 +53,7 @@ class UserViewSetTest(APITestCase):
 
     def test_user_create(self):
         """User creation test """
-        request = self.factory.post('/auth/user/create/',
+        request = self.factory.post('/auth/user/',
                                     json.dumps(self.valid_regular_user),
                                     content_type='application/json')
         force_authenticate(request, user=self.admin)
@@ -63,7 +63,7 @@ class UserViewSetTest(APITestCase):
 
     def test_invalid_user_create(self):
         """Invalid user creation test"""
-        request = self.factory.post('auth/user/create/',
+        request = self.factory.post('auth/user/',
                                     json.dumps(self.invalid_user),
                                     content_type='application/json')
         force_authenticate(request, user=self.admin)
@@ -157,7 +157,7 @@ class UserViewSetTest(APITestCase):
         self.assertListEqual(list(login_response.data), ['refresh', 'access'])
 
         refresh, access = login_response.data.values()
-
+        print(access)
         # registering new user
         # add token to request header
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
@@ -167,7 +167,7 @@ class UserViewSetTest(APITestCase):
                                             format='json'
                                            )
         #print(self.User.objects.all())
-        print(register_response.data)
+        print(register_response.status_code)
         #user = self.User.objects.get(email=register_response.data.get('email'))
         self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
         self.assertDictEqual(register_response.data, self.valid_regular_user)
