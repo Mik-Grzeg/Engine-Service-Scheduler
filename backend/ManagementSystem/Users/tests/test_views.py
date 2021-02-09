@@ -167,6 +167,7 @@ class UserViewSetTest(APITestCase):
                                             format='json'
                                            )
         #print(self.User.objects.all())
+        print(register_response.data)
         #user = self.User.objects.get(email=register_response.data.get('email'))
         self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
         self.assertDictEqual(register_response.data, self.valid_regular_user)

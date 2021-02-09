@@ -42,7 +42,7 @@ class UserViewSet(ModelViewSet):
         until user sets password or after some time defined in settings as PASSWORD_RESET_TIMEOUT variable.
         """
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        print(serializer.is_valid(raise_exception=True))
         user = self.perform_create(serializer)
 
         # Setting variables that are content of an email
