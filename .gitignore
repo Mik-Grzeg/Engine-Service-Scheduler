@@ -21,7 +21,7 @@ backend/ManagementSystem/.coverage
 .env.development.local
 .env.test.local
 .env.production.local
-/backend/ManagementSystem/ManagementSystem/local_settings.py
+.env
 OLD_VIEWS.py
 
 # virtual environment
