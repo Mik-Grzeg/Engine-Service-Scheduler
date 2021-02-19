@@ -21,7 +21,7 @@ class Installation(models.Model):
     installation_name = models.CharField(max_length=200)
     installation_location = models.CharField(max_length=300)
     #instalation_type
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='company')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
 
 class Contract(models.Model):
@@ -115,7 +115,7 @@ class Engine(models.Model):
     def oph_now(self, time=None):
         if not self.start_running:
             return self.oph
-        
+
         if time is None:
             time = now()
         return self.oph + (time - self.start_running)
