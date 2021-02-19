@@ -141,7 +141,7 @@ PASSWORD_RESET_TIMEOUT = 60 * 5
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
