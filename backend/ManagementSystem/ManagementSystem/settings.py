@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 import environ
+from datetime import timedelta
 import os
 
 # Read environmental variable
@@ -32,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+ALLOWED_HOSTS=['178.43.45.216', '0.0.0.0', '127.0.0.1']
 CORS_ORIGIN_ALLOW_ALL = True
 
 
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'corsheaders',
     'rest_framework',
+    'django_filters',
     'Users',
     'Clients',
 ]
@@ -127,7 +129,12 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    #'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60)
 }
 
 JWT_AUTH = {

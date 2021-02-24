@@ -1,6 +1,13 @@
+import datetime as dt
+
 from django.utils.timezone import now
 
+from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+
 import django_filters.rest_framework
 #from rest_framework.permissions import Dja
 
@@ -30,8 +37,47 @@ class EngineViewSet(ModelViewSet):
         """Method that chooses specific serializer class different actions."""
         if self.action == 'list':
             return serializers.EngineListSerializer
+        elif self.action.startswith('turn_'):
+            return serializers.EngineSwitchingStateSerializer
         else:
             return serializers.EngineSerializer
+
+    @action(detail=True, methods=['get'])
+    def turn_off(self, request, pk=None):
+        """Action for turning off an engine"""
+        engine = self.get_object()
+
+        time = None
+        if 'time' in request.data:
+            time_iso = request.data.get('time')
+            time = dt.datetime.fromisoformat(time_iso)
+        try:
+            engine.turn_off(time)
+            engine.save()
+            return Response({'current_oph': engine.oph}, status=status.HTTP_204_NO_CONTENT)
+        except ValueError as e:
+            return Response({"message": str(e)}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+
+    @action(detail=True, methods=['post'])
+    def turn_on(self, request, pk=None):
+        """Action for turning on an engine"""
+        engine = self.get_object()
+        print(self.get_serializer().data)
+        engine.turn_on(self.get_serializer().data.get('time'))
+        time = None
+        if 'time' in request.data:
+            time_iso = request.data.get('time')
+            time = dt.datetime.fromisoformat(time_iso)
+        try:
+            engine.turn_on(time)
+            engine.save()
+            return Response({'current_oph': engine.oph}, status=status.HTTP_204_NO_CONTENT)
+        except ValueError as e:
+            return Response({"message": str(e)}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
 
 class ServiceViewSet(ModelViewSet):
     """Service view set"""

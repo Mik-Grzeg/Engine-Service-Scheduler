@@ -142,12 +142,16 @@ class Engine(models.Model):
 
     def oph_after_off(self, time=None):
         """Method that update date of each service related to the object."""
+        if not self.stop_running:
+            return
         if time is None:
             time = now()
-        delta = time - self.stop_running
 
-        Service.objects.filter(engine=self).filter(date__gte=timezone.now().replace(hour=0, minute=0, second=0)).update(
+        delta = time - self.stop_running
+        print(delta)
+        x = Service.objects.filter(engine=self).filter(date__gte=timezone.now().replace(hour=0, minute=0, second=0)).update(
             date=models.F('date')+delta)
+        print(Service.objects.get(id=3).date)
 
 
     def turn_on(self, time=None):
@@ -166,7 +170,7 @@ class Engine(models.Model):
 
     @property
     def state(self):
-        if self.enabled:
+        if self.enabled and self.start_running < timezone.now():
             return 'Engine is running.'
         else:
             return 'Engine is stopped.'

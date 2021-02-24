@@ -18,11 +18,23 @@ class EngineListSerializer(serializers.ModelSerializer):
         model = models.Engine
         fields = ['id', 'serial_number', 'type']
 
-class EngineSerializer(serializers.ModelSerializer):
+class EngineSwitchingStateSerializer(serializers.ModelSerializer):
+    """Serializer that takes only one field which is datetime"""
+    time = serializers.DateTimeField()
 
     class Meta:
         model = models.Engine
-        exclude = []
+        fields = ['time']
+#class EngineSwitchOffSerializer(EngineSwitchingStateSerializer):
+#    def validate_time(self):
+
+
+class EngineSerializer(serializers.ModelSerializer):
+    state = serializers.ReadOnlyField()
+
+    class Meta:
+        model = models.Engine
+        exclude = ['enabled', ]
 
 class InstallationSerializer(serializers.ModelSerializer):
     """Installation serializer"""
