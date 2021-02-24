@@ -1,5 +1,7 @@
 import datetime as dt
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 from django.db import models
 from django.utils.timezone import now
 from django.utils import timezone
@@ -10,6 +12,7 @@ from django.contrib.postgres.fields import DateRangeField
 class Company(models.Model):
     """Company model"""
     name = models.CharField(max_length=200)
+    contact = PhoneNumberField()
 
     class Meta:
         verbose_name_plural = 'companies'
@@ -26,7 +29,8 @@ class Installation(models.Model):
 
 class Contract(models.Model):
     """Contract model that refers to a specific installation"""
-    period = DateRangeField()
+    contract_start = models.DateField()
+    contract_end = models.DateField()
     date_of_signing = models.DateField()
     price_per_hour = models.FloatField()
     oph_yet = models.FloatField(default=0)
@@ -64,6 +68,7 @@ class Engine(models.Model):
         (FUEL_TWO, 'Two'),
     ]
 
+    # TODO 3 letters 
     ENGINE_3 = '3'
     ENGINE_2 = '2'
     ENGINE_CHOICES = [
@@ -71,6 +76,7 @@ class Engine(models.Model):
         (ENGINE_3, 'Type 3'),
     ]
 
+    installation = models.OneToOneField(to=Installation, on_delete=models.CASCADE)
     serial_number = models.CharField(max_length=100, unique=True)
 
     # Types
@@ -79,20 +85,20 @@ class Engine(models.Model):
 
     # date when the engine has started
     start_running = models.DateTimeField(null=True)
-    stop_running = models.DateTimeField(null=True)
+    stop_running = models.DateTimeField(null=True, blank=True)
 
     # till when the engine is off
     stopped_till = models.DateTimeField(null=True, blank=True)
 
     # operating hours so far
-    oph = models.DurationField(default=dt.timedelta(hours=0))
+    oph = models.FloatField(default=0)
 
     # expected average oph per month
-    oph_per_month = models.DurationField()
+    oph_per_month = models.FloatField()
 
     # hours between services
-    interval = models.DurationField()
-    general_interval = models.DurationField()
+    interval = models.FloatField()
+    general_interval = models.FloatField()
 
     # costs of services
     interval_cost = models.DecimalField(max_digits=6, decimal_places=2)
@@ -112,13 +118,14 @@ class Engine(models.Model):
     class Meta:
         pass
 
+
     def oph_now(self, time=None):
         if not self.start_running:
             return self.oph
 
         if time is None:
             time = now()
-        return self.oph + (time - self.start_running)
+        return self.oph + (time - self.start_running).total_seconds() / 3600
 
     def turn_off(self, time=None):
         """Method that switches off the engine and set date of its happening"""
@@ -178,11 +185,12 @@ class Service(models.Model):
 
     service_type = models.CharField(max_length=1, choices=ENGINE_CHOICES)
 
-    date = models.DateTimeField()
+    date = models.DateField()
 
-    interval = models.DurationField()
+    interval = models.FloatField()
 
     confirmed = models.BooleanField(default=False)
     engine = models.ForeignKey(Engine, null=True, on_delete=models.SET_NULL)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
 
