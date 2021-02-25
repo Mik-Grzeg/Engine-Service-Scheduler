@@ -33,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS=['178.43.45.216', '0.0.0.0', '127.0.0.1']
+ALLOWED_HOSTS=env.list('ALLOWED_HOSTS')
 CORS_ORIGIN_ALLOW_ALL = True
 
 
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'phonenumber_field',
     'corsheaders',
+    'django_celery_beat',
     'rest_framework',
     'django_filters',
     'Users',
@@ -161,3 +162,25 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+from celery.schedules import crontab
+
+from .tasks import *
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+CELERY_BEAT_SCHEDULE = {
+    "update_oph": {
+        "task": "Clients.tasks.update_oph",
+        "schedule": crontab(minute="*/1"),
+    },
+    "enable_engines": {
+        "task": "Clients.tasks.enable_engines",
+        "schedule": crontab(minute="*/1")
+    },
+    "disable_engines": {
+        "task": "Clients.tasks.disable_engines",
+        "schedule": crontab(minute="*/1")
+    },
+}

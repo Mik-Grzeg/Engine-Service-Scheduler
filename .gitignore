@@ -27,6 +27,9 @@ OLD_VIEWS.py
 # virtual environment
 venv/
 
+# celery schedule
+backend/ManagementSystem/celerybeat-schedule
+
 # db
 backend/ManagementSystem/db.sqlite3
 
