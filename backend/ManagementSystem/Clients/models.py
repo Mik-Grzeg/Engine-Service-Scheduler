@@ -118,13 +118,12 @@ class Engine(models.Model):
     class Meta:
         pass
 
-
     def oph_now(self, time=None):
-        if not self.start_running:
-            return self.oph
-
         if time is None:
             time = now()
+
+        if not self.start_running or self.start_running > time:
+            return self.oph
         return self.oph + (time - self.start_running).total_seconds() / 3600
 
     def turn_off(self, time=None):
@@ -148,14 +147,14 @@ class Engine(models.Model):
             time = now()
 
         delta = time - self.stop_running
-        print(delta)
-        x = Service.objects.filter(engine=self).filter(date__gte=timezone.now().replace(hour=0, minute=0, second=0)).update(
+        if delta > dt.timedelta(hours=0):
+            Service.objects.filter(engine=self).filter(date__gte=timezone.now().replace(hour=0, minute=0, second=0)).update(
             date=models.F('date')+delta)
-        print(Service.objects.get(id=3).date)
 
 
     def turn_on(self, time=None):
         """Method that switches on the engine and recalculate dates of services."""
+        print(self.enabled)
         if self.enabled:
             raise ValueError('Engine is already running.')
 
@@ -164,13 +163,15 @@ class Engine(models.Model):
 
         self.oph_after_off(time)
 
-        self.stop_running = None
+        if time <= now():
+            self.stop_running = None
         self.start_running = time
-        self.enabled = True
+        if self.start_running <= now():
+            self.enabled = True
 
     @property
     def state(self):
-        if self.enabled and self.start_running < timezone.now():
+        if self.enabled:
             return 'Engine is running.'
         else:
             return 'Engine is stopped.'

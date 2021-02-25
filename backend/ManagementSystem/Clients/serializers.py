@@ -31,10 +31,14 @@ class EngineSwitchingStateSerializer(serializers.ModelSerializer):
 
 class EngineSerializer(serializers.ModelSerializer):
     state = serializers.ReadOnlyField()
+    oph_now = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Engine
         exclude = ['enabled', ]
+        extra_kwargs = {
+            'oph': {'write_only': True}
+        }
 
 class InstallationSerializer(serializers.ModelSerializer):
     """Installation serializer"""

@@ -39,6 +39,8 @@ class EngineViewSet(ModelViewSet):
             return serializers.EngineListSerializer
         elif self.action.startswith('turn_'):
             return serializers.EngineSwitchingStateSerializer
+        elif self.action == 'oph':
+            return serializers.EngineOphSerializer
         else:
             return serializers.EngineSerializer
 
@@ -64,11 +66,11 @@ class EngineViewSet(ModelViewSet):
     def turn_on(self, request, pk=None):
         """Action for turning on an engine"""
         engine = self.get_object()
-        print(self.get_serializer().data)
-        engine.turn_on(self.get_serializer().data.get('time'))
+        #engine.turn_on(self.get_serializer().data.get('time'))
+
         time = None
-        if 'time' in request.data:
-            time_iso = request.data.get('time')
+        time_iso = request.data.get('time')
+        if time_iso:
             time = dt.datetime.fromisoformat(time_iso)
         try:
             engine.turn_on(time)
@@ -76,7 +78,6 @@ class EngineViewSet(ModelViewSet):
             return Response({'current_oph': engine.oph}, status=status.HTTP_204_NO_CONTENT)
         except ValueError as e:
             return Response({"message": str(e)}, status=status.HTTP_406_NOT_ACCEPTABLE)
-
 
 
 class ServiceViewSet(ModelViewSet):
