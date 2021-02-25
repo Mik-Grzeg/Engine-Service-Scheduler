@@ -128,11 +128,20 @@ class Engine(models.Model):
 
     def turn_off(self, time=None):
         """Method that switches off the engine and set date of its happening"""
+
+        time_now = now()
+
         if not self.enabled:
             raise ValueError('Engine is already stopped.')
-        if time is None:
-            time = now()
-        self.oph = self.oph_now(time)
+        elif time is None:
+            time = time_now
+        elif time < time_now.replace(minute=0, second=0):
+            # Need to revert clock to the moment that it has been stopped
+            self.oph -= (time_now - time).total_seconds() / 3600
+        elif time > time_now:
+            # If the switching off is planned in advance, then set deadline.
+            self.stop_running = time
+            return
 
         self.start_running = None
         self.stop_running = time

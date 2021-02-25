@@ -44,7 +44,7 @@ class EngineViewSet(ModelViewSet):
         else:
             return serializers.EngineSerializer
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['post'])
     def turn_off(self, request, pk=None):
         """Action for turning off an engine"""
         engine = self.get_object()
