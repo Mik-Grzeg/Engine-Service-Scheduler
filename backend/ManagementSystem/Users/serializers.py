@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from rest_framework.validators import UniqueValidator
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.password_validation import validate_password
@@ -26,20 +28,48 @@ class GroupSerializer(ModelSerializer):
         fields = ('name', 'permissions', 'user_set')
 
 
+class GroupListSerializer(ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('name', )
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        # Default result (access/refresh tokens)
+        data = super(LoginSerializer, self).validate(attrs)
+
+        # Adding custom data
+        data.update({'first_name': self.user.first_name})
+
+        return data
+
+
 class UserSerializer(ModelSerializer):
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
        )
     work_phone = serializers.CharField(required=True)
+    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name', many=True)
+    user_permissions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'work_phone')
+        fields = ('id', 'email', 'first_name', 'last_name', 'work_phone', 'groups', 'user_permissions')
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
         }
+
+    def get_user_permissions(self, user):
+        if user.is_superuser:
+            permissions = Permission.objects.all()
+        else:
+            permissions = Permission.objects.filter(group__user=user) |\
+                          user.user_permissions.all()
+        return [permission.codename for permission in permissions]
+
 
 
     def create(self):
