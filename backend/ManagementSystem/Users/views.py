@@ -6,15 +6,16 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes, action
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.sites.shortcuts import get_current_site
 
 from django.utils.http import urlsafe_base64_decode
 
-from .serializers import (UserSerializer, PasswordSetSerializer,
-                          ForgotPasswordSerializer, GroupSerializer,
-                          PasswordChangeSerializer)
+from . import serializers
+
 from .utils import send_mail
 from .permissions import VerifiedPermission, SingleUseLinkPermission
 
@@ -25,8 +26,15 @@ User = get_user_model()
 class GroupView(ModelViewSet):
     """Group viewset"""
 
-    serializer_class = GroupSerializer
+    serializer_class = serializers.GroupSerializer
     queryset = Group.objects.all()
+
+class LoginView(TokenObtainPairView):
+    """
+    Takes a set of user credentials and returns first name of the user, an access and refresh JSON web
+    token pair to prove authentication of those credentials.
+    """
+    serializer_class = serializers.LoginSerializer
 
 @permission_classes([DjangoModelPermissions])
 class UserViewSet(ModelViewSet):
@@ -34,7 +42,7 @@ class UserViewSet(ModelViewSet):
     User View Set that allows creating
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
 
     def create(self, request, *args, **kwargs):
         """
@@ -72,7 +80,7 @@ class UserViewSet(ModelViewSet):
         # Decoding uid that is provided in request
         uid = urlsafe_base64_decode(request.data.get('uidb64')).decode()
         instance = User.objects.get(pk=uid)
-        serializer = PasswordSetSerializer(data=request.data, instance=instance)
+        serializer = serializers.PasswordSetSerializer(data=request.data, instance=instance)
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -122,7 +130,7 @@ class UserViewSet(ModelViewSet):
         subject = 'Password reset.'
 
         try:
-            serializer = ForgotPasswordSerializer(data=request.data)
+            serializer = serializers.ForgotPasswordSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
 
             # Getting user in order to invoke send_mail method.
@@ -143,7 +151,7 @@ class UserViewSet(ModelViewSet):
         """
         instance = request.user
         # validation of data
-        serializer = PasswordChangeSerializer(data=request.data, instance=instance)
+        serializer = serializers.PasswordChangeSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
