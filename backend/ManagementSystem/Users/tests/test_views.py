@@ -99,7 +99,7 @@ class UserViewSetTest(APITestCase):
         token = user.generate_mail_token()
         passwd = 'Passw0rd123'
 
-        url = '/auth/user/set_password/'
+        url = '/api/auth/user/set_password/'
         payload = {
             "uidb64": uidb64,
             "token": token,
@@ -133,7 +133,7 @@ class UserViewSetTest(APITestCase):
         uidb64 = user.generate_uid()
         token = user.generate_mail_token()
 
-        url = f'/auth/user/verify_link/{uidb64}/{token}/'
+        url = f'/api/auth/user/verify_link/{uidb64}/{token}/'
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -150,7 +150,7 @@ class UserViewSetTest(APITestCase):
 
     def test_registering_activating_and_setting_password(self):
         """Testing activation account by emailed link, and setting password"""
-        login_url = '/auth/login/'
+        login_url = '/api/auth/login/'
         login_response = self.client.post(login_url, {"email": self.admin.email, "password": self.admin_passwd},
                                           format='json')
         self.assertEqual(login_response.status_code, status.HTTP_200_OK)
@@ -160,7 +160,7 @@ class UserViewSetTest(APITestCase):
         # registering new user
         # add token to request header
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
-        register_url = '/auth/user/'
+        register_url = '/api/auth/user/'
         register_response = self.client.post(register_url,
                                             data=self.valid_regular_user,
                                             format='json'
@@ -177,7 +177,7 @@ class UserViewSetTest(APITestCase):
         # request to activate user's account.
         # remove access token from request header
         self.client.credentials()
-        activate_url = f'/auth/user/activate_account/{uidb64}/{token}/'
+        activate_url = f'/api/auth/user/activate_account/{uidb64}/{token}/'
         activate_response = self.client.get(activate_url)
         user.refresh_from_db()
 
@@ -189,7 +189,7 @@ class UserViewSetTest(APITestCase):
         self.assertFalse(user.check_password(new_password))
 
         # request to set user's password
-        set_password_url = '/auth/user/set_password/'
+        set_password_url = '/api/auth/user/set_password/'
         set_password_response = self.client.patch(set_password_url,
                                                   data={**activate_response.data,
                                                         'password1': new_password,
@@ -227,10 +227,10 @@ class UserViewSetTest(APITestCase):
 
 
     def test_change_password(self):
-        url = '/auth/user/change_password/'
         old_passwd = 'Pasw0rd123'
         new_passwd = 'Pa$$w0rd123'
         user = self.User.objects.create_user(**self.valid_regular_user, password=old_passwd, is_verified=True)
+        url = '/api/auth/user/change_password/'
 
         # force_authentication because change_password action only needs user to be authenticated and verified
         # which has already been tested
@@ -240,7 +240,6 @@ class UserViewSetTest(APITestCase):
                                            'password1': new_passwd,
                                            'password2': new_passwd},
                                      format='json')
-
         self.assertTrue(user.check_password(new_passwd))
         self.assertDictEqual(response.data, {'message': 'Password has been updated successfully'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
