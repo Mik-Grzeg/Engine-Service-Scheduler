@@ -1,0 +1,36 @@
+@import "../shared_scss/variable.scss";
+
+.LoginContainer {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(
+    to bottom right,
+    $background-gradient-1,
+    $background-gradient-2
+  );
+}
+.LoginPaper {
+  min-height: 40vh;
+  background-color: $paper-logincolor;
+}
+
+@media (max-width: 1200px) {
+  .LoginPaper {
+    min-height: 50vh;
+    margin: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .LoginPaper {
+    min-height: 60vh;
+    margin: 15px;
+  }
+}
+
+.LoginPaperMargin {
+  margin: $paper-loginMargin;
+}
