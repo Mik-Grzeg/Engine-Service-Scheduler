@@ -58,6 +58,7 @@ class UserViewSetTest(APITestCase):
                                     content_type='application/json')
         force_authenticate(request, user=self.admin)
         response = UserViewSet.as_view({'post': 'create'})(request)
+        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -154,9 +155,9 @@ class UserViewSetTest(APITestCase):
         login_response = self.client.post(login_url, {"email": self.admin.email, "password": self.admin_passwd},
                                           format='json')
         self.assertEqual(login_response.status_code, status.HTTP_200_OK)
-        self.assertListEqual(list(login_response.data), ['refresh', 'access'])
+        self.assertListEqual(list(login_response.data), ['refresh', 'access', 'first_name'])
 
-        refresh, access = login_response.data.values()
+        refresh, access, first_name = login_response.data.values()
         # registering new user
         # add token to request header
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')

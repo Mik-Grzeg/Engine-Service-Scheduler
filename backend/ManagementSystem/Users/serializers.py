@@ -51,7 +51,7 @@ class UserSerializer(ModelSerializer):
         validators=[UniqueValidator(queryset=User.objects.all())]
        )
     work_phone = serializers.CharField(required=True)
-    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name', many=True)
+    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name', many=True, required=False)
     user_permissions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -62,12 +62,18 @@ class UserSerializer(ModelSerializer):
             'last_name': {'required': True},
         }
 
-    def get_user_permissions(self, user):
-        if user.is_superuser:
-            permissions = Permission.objects.all()
+    def get_user_permissions(self, obj):
+        """Method that returns all permissions of the user"""
+        if isinstance(obj, User):
+            if obj.is_superuser:
+                permissions = Permission.objects.all()
+            else:
+                permissions = Permission.objects.filter(group__user=obj) |\
+                              obj.user_permissions.all()
         else:
-            permissions = Permission.objects.filter(group__user=user) |\
-                          user.user_permissions.all()
+            # If the user has just been created then, obj is ordereddict rather than User instance.
+            # Hence permissions must be filtered by the names of groups that the user has been assigned to.
+            permissions = Permission.objects.filter(group__name__in=obj['groups'])
         return [permission.codename for permission in permissions]
 
 
@@ -79,6 +85,14 @@ class UserSerializer(ModelSerializer):
             last_name=self.validated_data['last_name'],
             work_phone=self.validated_data['work_phone'],
         )
+
+        try:
+            groups = self.validated_data['groups']
+            for group in groups:
+                print(group)
+                user.groups.add(group)
+        except:
+            pass
 
         return user
 

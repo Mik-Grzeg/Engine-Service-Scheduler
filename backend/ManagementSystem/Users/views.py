@@ -61,11 +61,10 @@ class UserViewSet(ModelViewSet):
 
         # sending verification link to the provided email address
         user.send_mail(current_site, html_template, subject)
-
         # If no exception has been raised, 201 is returned.
-        return Response(serializer.data,
+        return Response(serializer.validated_data,
                         status=status.HTTP_201_CREATED,
-                        headers=self.get_success_headers(serializer.data))
+                        headers=self.get_success_headers(serializer.validated_data))
 
     def perform_create(self, serializer):
         return serializer.create()
