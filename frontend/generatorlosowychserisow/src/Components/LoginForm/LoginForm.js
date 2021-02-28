@@ -9,9 +9,10 @@ import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import { MdVisibility } from "react-icons/md";
 import { MdVisibilityOff } from "react-icons/md";
+import { fetchUser } from "../../actions/userActions";
 import "./LoginForm.scss";
 
-function LoginForm({ requierdEmail }) {
+function LoginForm({ requierdEmail, fetchUser, errorLogIn }) {
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -30,6 +31,8 @@ function LoginForm({ requierdEmail }) {
     event.preventDefault();
     if (values.email.includes(requierdEmail)) {
       //Post if data is correct
+
+      fetchUser({ email: values.email, password: values.password });
     } else if (!values.email.includes("@")) {
       //if the email value doesnt contein @ we
       //suppose user added only the beggining of his email
@@ -37,6 +40,7 @@ function LoginForm({ requierdEmail }) {
         ...values,
         email: values.email.concat(requierdEmail),
       });
+      fetchUser({ email: values.email, password: values.password });
     }
   };
 
@@ -45,7 +49,7 @@ function LoginForm({ requierdEmail }) {
       <Grid container direction="row" justify="center" spacing={4}>
         <Grid item xs={12} className="login_logo"></Grid>
         <Grid className="EmailMargin" item xs={12} sm={10} md={8}>
-          <FormControl fullWidth={true}>
+          <FormControl fullWidth={true} error={errorLogIn}>
             <InputLabel htmlFor="email">Email</InputLabel>
             <Input
               id="email"
@@ -59,7 +63,7 @@ function LoginForm({ requierdEmail }) {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={10} md={8}>
-          <FormControl fullWidth={true}>
+          <FormControl fullWidth={true} error={errorLogIn}>
             <InputLabel htmlFor="password">Password</InputLabel>
             <Input
               id="password"
@@ -101,7 +105,16 @@ function LoginForm({ requierdEmail }) {
 }
 
 const mapStateToProps = (state) => {
-  return { requierdEmail: state.requierdEmail };
+  return {
+    requierdEmail: state.userReducer.requierdEmail,
+    errorLogIn: state.userReducer.errorLogIn,
+  };
 };
 
-export default connect(mapStateToProps)(LoginForm);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchUser: (userInfo) => dispatch(fetchUser(userInfo)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginForm);
