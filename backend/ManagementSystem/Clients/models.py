@@ -1,12 +1,9 @@
 import datetime as dt
 
-from phonenumber_field.modelfields import PhoneNumberField
-
-from django.db import models
-from django.utils.timezone import now
-from django.utils import timezone
 from django.contrib.postgres.fields import DateRangeField
-
+from django.db import models
+from django.utils import timezone
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Company(models.Model):
@@ -120,7 +117,7 @@ class Engine(models.Model):
 
     def oph_now(self, time=None):
         if time is None:
-            time = now()
+            time = timezone.now()
 
         if not self.start_running or self.start_running > time:
             return self.oph
@@ -129,7 +126,7 @@ class Engine(models.Model):
     def turn_off(self, time=None):
         """Method that switches off the engine and set date of its happening"""
 
-        time_now = now()
+        time_now = timezone.now()
 
         if not self.enabled:
             raise ValueError('Engine is already stopped.')
@@ -153,11 +150,11 @@ class Engine(models.Model):
         if not self.stop_running:
             return
         if time is None:
-            time = now()
+            time = timezone.now()
 
         delta = time - self.stop_running
         if delta > dt.timedelta(hours=0):
-            Service.objects.filter(engine=self).filter(date__gte=timezone.now().replace(hour=0, minute=0, second=0)).update(
+            Service.objects.filter(engine=self).filter(date__gte=timezone.timezone.now().replace(hour=0, minute=0, second=0)).update(
             date=models.F('date')+delta)
 
 
@@ -168,14 +165,14 @@ class Engine(models.Model):
             raise ValueError('Engine is already running.')
 
         if time is None:
-            time = now()
+            time = timezone.now()
 
         self.oph_after_off(time)
 
-        if time <= now():
+        if time <= timezone.now():
             self.stop_running = None
         self.start_running = time
-        if self.start_running <= now():
+        if self.start_running <= timezone.now():
             self.enabled = True
 
     @property

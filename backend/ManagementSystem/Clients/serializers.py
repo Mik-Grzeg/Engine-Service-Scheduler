@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Company, Installation, Contract
 
 from . import models
+from .models import Company, Contract, Installation
 
 
 class ContractListSerializer(serializers.ModelSerializer):
@@ -39,6 +39,7 @@ class EngineSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'oph': {'write_only': True}
         }
+
 
 class InstallationSerializer(serializers.ModelSerializer):
     """Installation serializer"""

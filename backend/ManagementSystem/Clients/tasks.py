@@ -1,10 +1,9 @@
-from celery import task
-from celery import shared_task
+import datetime as dt
 
+from celery import shared_task, task
 from django.apps import apps
 from django.db.models import F
 
-import datetime as dt
 
 @shared_task
 def enable_engines():

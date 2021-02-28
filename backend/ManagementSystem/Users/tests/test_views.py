@@ -1,17 +1,17 @@
-from django.test import TestCase, Client
-from django.urls import reverse
+import json
 
-from rest_framework import status
-from rest_framework.test import APIRequestFactory, force_authenticate, APITestCase, APIClient
-from rest_framework_simplejwt.tokens import AccessToken
-from ..views import UserViewSet
-
+from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.test import Client, TestCase
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.contrib.auth import get_user_model
+from rest_framework import status
+from rest_framework.test import (APIClient, APIRequestFactory, APITestCase,
+                                 force_authenticate)
+from rest_framework_simplejwt.tokens import AccessToken
 
-import json
+from ..views import UserViewSet
 
 
 class UserViewSetTest(APITestCase):
@@ -58,7 +58,6 @@ class UserViewSetTest(APITestCase):
                                     content_type='application/json')
         force_authenticate(request, user=self.admin)
         response = UserViewSet.as_view({'post': 'create'})(request)
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 

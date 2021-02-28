@@ -1,17 +1,13 @@
-from django.db import models
-from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractBaseUser
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth import password_validation
-from django.template.loader import render_to_string
-
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.tokens import default_token_generator
+from django.core.validators import RegexValidator
+from django.db import models
+from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-
-from django.core.validators import RegexValidator
-
+from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 

@@ -23,6 +23,7 @@ django-timezone-field==4.1.1
 djangorestframework==3.12.2
 djangorestframework-simplejwt==4.6.0
 idna==2.10
+isort==5.7.0
 kombu==4.6.11
 oauthlib==3.1.0
 phonenumbers==8.12.17

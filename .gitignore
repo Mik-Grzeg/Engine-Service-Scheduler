@@ -32,6 +32,7 @@ backend/ManagementSystem/celerybeat-schedule
 
 # db
 backend/ManagementSystem/db.sqlite3
+.defining_groups.py.swp
 
 npm-debug.log*
 yarn-debug.log*
