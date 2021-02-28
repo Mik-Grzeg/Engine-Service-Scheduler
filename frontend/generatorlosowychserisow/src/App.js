@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import react, { useEffect } from "react";
+import { connect } from "react-redux";
+import { LOG_IN, AUTO_LOG_IN } from "./actions/userActions";
+import LoginContainer from "./containers/LoginContainer";
+import MainContainer from "./containers/MainContainer";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App({ loggedIn, name }) {
+  useEffect(() => {}, []);
+  return <>{!loggedIn ? <LoginContainer /> : <MainContainer />}</>;
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    loggedIn: state.userReducer.loggedIn,
+    name: state.userReducer.user.name,
+  };
+};
+const mapDispatchToState = (dispatch) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToState)(App);

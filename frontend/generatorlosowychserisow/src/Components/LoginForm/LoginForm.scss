@@ -1,0 +1,13 @@
+@import "../../shared_scss/variable";
+.login_logo {
+  min-height: 160px;
+  background-image: linear-gradient(
+    to bottom right,
+    $backgroundlogo-gradient-1,
+    $backgroundlogo-gradient-2
+  );
+  margin-bottom: 16px;
+}
+.EmailMargin {
+  margin-top: 24px !important;
+}
