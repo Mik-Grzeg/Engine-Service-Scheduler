@@ -1,18 +1,32 @@
-from rest_framework.permissions import BasePermission
-from rest_framework.exceptions import APIException, NotFound, NotAcceptable, NotAuthenticated, MethodNotAllowed
-from rest_framework import status
 from django.contrib.auth import get_user_model
-
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from rest_framework import status
+from rest_framework.exceptions import (APIException, MethodNotAllowed,
+                                       NotAcceptable, NotAuthenticated,
+                                       NotFound)
+from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 User = get_user_model()
+
+
+class DjangoModelPermissionsWithRead(DjangoModelPermissions):
+    perms_map = {
+        'GET': ['%(app_label)s.view_%(model_name)s'],
+        'OPTIONS': [],
+        'HEAD': [],
+        'POST': ['%(app_label)s.add_%(model_name)s'],
+        'PUT': ['%(app_label)s.change_%(model_name)s'],
+        'PATCH': ['%(app_label)s.change_%(model_name)s'],
+        'DELETE': ['%(app_label)s.delete_%(model_name)s'],
+    }
 
 
 class SingleUseLinkPermission(BasePermission):
     """
     Permission class that if the one-time link is valid, which was sent in mail.
     """
+
     def has_permission(self, request, view):
         """
         Url is composed from:
@@ -38,11 +52,11 @@ class SingleUseLinkPermission(BasePermission):
         raise NotAcceptable({'error': True, 'message': 'That link is broken or it has already been used.'})
 
 
-
 class VerifiedPermission(BasePermission):
     """
     Permission that checks if user / email has already  been verified by email link.
     """
+
     def has_permission(self, request, view):
         if request.user.is_anonymous:
             # User might be anonymous because it also checks permissions for views like forgot password.
@@ -52,7 +66,7 @@ class VerifiedPermission(BasePermission):
                 verified = user.is_verified
             except User.DoesNotExist:
                 # User with the provived email coudln't be found in database.
-                detail = {'error': True, 'message':  'We couldn\'t find a user connected to that email address.'}
+                detail = {'error': True, 'message': 'We couldn\'t find a user connected to that email address.'}
                 raise NotFound(detail)
         else:
             verified = request.user.is_verified
@@ -60,6 +74,7 @@ class VerifiedPermission(BasePermission):
         if verified:
             return True
         raise NeedVerification()
+
 
 class NeedVerification(APIException):
     status_code = status.HTTP_403_FORBIDDEN

@@ -10,11 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
-from django.core.exceptions import ImproperlyConfigured
-import environ
-from datetime import timedelta
 import os
+from datetime import timedelta
+from pathlib import Path
+
+import environ
 
 # Read environmental variable
 env = environ.Env()
@@ -129,7 +129,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'Users.permissions.DjangoModelPermissionsWithRead',
+        'Users.permissions.VerifiedPermission',
     ],
     #'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
