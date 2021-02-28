@@ -1,12 +1,12 @@
-from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
-from rest_framework.validators import UniqueValidator
-
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
-from django.contrib.auth.password_validation import validate_password
+from django.utils.translation import gettext_lazy as _
+
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import ModelSerializer
+from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -51,7 +51,8 @@ class UserSerializer(ModelSerializer):
         validators=[UniqueValidator(queryset=User.objects.all())]
        )
     work_phone = serializers.CharField(required=True)
-    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name', many=True, required=False)
+    groups = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name',
+                                          many=True, required=False)
     user_permissions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -86,13 +87,10 @@ class UserSerializer(ModelSerializer):
             work_phone=self.validated_data['work_phone'],
         )
 
-        try:
-            groups = self.validated_data['groups']
+        groups = self.validated_data.get('groups')
+        if groups:
             for group in groups:
-                print(group)
                 user.groups.add(group)
-        except:
-            pass
 
         return user
 
@@ -114,9 +112,9 @@ class PasswordSetSerializer(serializers.Serializer):
         """
 
         if attrs['password1'] != attrs['password2']:
-            raise serializers.ValidationError('New passwords do not match')
+            raise serializers.ValidationError(_('New passwords do not match'))
         if self.instance.check_password(attrs['password1']):
-            raise serializers.ValidationError('New password can not be the same as the old one.')
+            raise serializers.ValidationError(_('New password can not be the same as the old one.'))
         return attrs
 
     def save(self):
@@ -137,7 +135,8 @@ class PasswordChangeSerializer(PasswordSetSerializer):
         """
         Checks if current_password is correct.
         """
-        self.instance.check_password(value)
+        if not self.instance.check_password(value):
+            raise serializers.ValidationError(_('Your old password was entered incorrectly. Please enter in again.'))
         return value
 
 class ForgotPasswordSerializer(serializers.Serializer):
@@ -145,5 +144,5 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         if User.objects.filter(email=value).count() == 0:
-            raise serializers.ValidationError('We could not find any user with provided email address.')
+            raise serializers.ValidationError(_('We could not find any user with provided email address.'))
         return value

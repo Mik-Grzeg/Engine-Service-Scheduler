@@ -1,33 +1,28 @@
-from rest_framework.permissions import (DjangoModelPermissions,
-                                        IsAuthenticated
-                                        )
-from rest_framework import generics, status
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
-from rest_framework.decorators import permission_classes, action
-
-from rest_framework_simplejwt.views import TokenObtainPairView
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.sites.shortcuts import get_current_site
-
 from django.utils.http import urlsafe_base64_decode
+from django.utils.translation import gettext_lazy as _
+
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from . import serializers
-
-from .utils import send_mail
-from .permissions import VerifiedPermission, SingleUseLinkPermission
-
+from .permissions import SingleUseLinkPermission, VerifiedPermission
 
 User = get_user_model()
 
-@permission_classes([DjangoModelPermissions])
+
 class GroupView(ModelViewSet):
     """Group viewset"""
 
     serializer_class = serializers.GroupSerializer
     queryset = Group.objects.all()
+
 
 class LoginView(TokenObtainPairView):
     """
@@ -36,13 +31,23 @@ class LoginView(TokenObtainPairView):
     """
     serializer_class = serializers.LoginSerializer
 
-@permission_classes([DjangoModelPermissions])
+
 class UserViewSet(ModelViewSet):
     """
-    User View Set that allows creating
+    User View Set
     """
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+
+    def get_serializer_class(self):
+        """Getting proper serializers for specific actions."""
+        if self.action == 'change_password':
+            return serializers.PasswordChangeSerializer
+        if self.action == 'set_password':
+            return serializers.PasswordSetSerializer
+        if self.action == 'forgot_password':
+            return serializers.ForgotPasswordSerializer
+        return serializers.UserSerializer
 
     def create(self, request, *args, **kwargs):
         """
@@ -58,13 +63,13 @@ class UserViewSet(ModelViewSet):
         html_template = 'Users/account_activation.html'
         subject = 'Account activation.'
 
-
         # sending verification link to the provided email address
         user.send_mail(current_site, html_template, subject)
         # If no exception has been raised, 201 is returned.
-        return Response(serializer.validated_data,
+
+        return Response(serializer.initial_data,
                         status=status.HTTP_201_CREATED,
-                        headers=self.get_success_headers(serializer.validated_data))
+                        headers=self.get_success_headers(serializer.initial_data))
 
     def perform_create(self, serializer):
         return serializer.create()
@@ -79,14 +84,14 @@ class UserViewSet(ModelViewSet):
         # Decoding uid that is provided in request
         uid = urlsafe_base64_decode(request.data.get('uidb64')).decode()
         instance = User.objects.get(pk=uid)
-        serializer = serializers.PasswordSetSerializer(data=request.data, instance=instance)
+        serializer = self.get_serializer(data=request.data, instance=instance)
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        content = {'message': 'Password has been updated successfully.'}
+        content = {'message': _('Password has been updated successfully.')}
         return Response(content, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'], permission_classes=[SingleUseLinkPermission&~IsAuthenticated],
+    @action(detail=False, methods=['get'], permission_classes=[SingleUseLinkPermission & ~IsAuthenticated],
             url_path=r'verify_link/(?P<uidb64>.+)/(?P<token>.+)', url_name='verify-link')
     def verify_one_time_link(self, request, uidb64, token):
         """
@@ -94,9 +99,9 @@ class UserViewSet(ModelViewSet):
         if it wasn't for that view, users would have to input new passwords,
         before finding out that the link has already expired or is just broken.
         """
-        return Response({'token': token, 'uidb64' : uidb64}, status=status.HTTP_200_OK)
+        return Response({'token': token, 'uidb64': uidb64}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'], permission_classes=[SingleUseLinkPermission&~IsAuthenticated],
+    @action(detail=False, methods=['get'], permission_classes=[SingleUseLinkPermission & ~IsAuthenticated],
             url_path=r'activate_account/(?P<uidb64>.+)/(?P<token>.+)')
     def activate_account(self, request, uidb64, token):
         """
@@ -107,16 +112,16 @@ class UserViewSet(ModelViewSet):
         user = User.objects.get(pk=urlsafe_base64_decode(uidb64).decode())
         if user.is_verified:
             # return 204 if user has already been verified
-            content = {'message': 'Your account was already verified.'}
+            content = {'message': _('Your account was already verified.')}
             return Response(content, status=status.HTTP_204_NO_CONTENT)
 
         # Setting verification flag.
         user.is_verified = True
         user.save()
 
-        return Response({'token': token, 'uidb64' : uidb64}, status=status.HTTP_200_OK)
+        return Response({'token': token, 'uidb64': uidb64}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['put'], permission_classes=[VerifiedPermission&~IsAuthenticated])
+    @action(detail=False, methods=['put'], permission_classes=[VerifiedPermission & ~IsAuthenticated])
     def forgot_password(self, request):
         """
         Forgot password method that verifies user existence in db, so as verification status.
@@ -129,30 +134,31 @@ class UserViewSet(ModelViewSet):
         subject = 'Password reset.'
 
         try:
-            serializer = serializers.ForgotPasswordSerializer(data=request.data)
+            serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
 
             # Getting user in order to invoke send_mail method.
             user = User.objects.get(email=serializer.validated_data.get('email'))
             user.send_mail(current_site, html_template, subject)
 
-            content = {'message': 'Check your inbox, there should be a mail with a link.'
-                                  'If you have not received the mail, try checking in spam'}
+            content = {'message': _('Check your inbox, there should be a mail with a link.'
+                                    'If you have not received the mail, try checking in spam')}
             return Response(content, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['patch'], permission_classes = [VerifiedPermission&IsAuthenticated])
+    @action(detail=False, methods=['patch'], permission_classes=[VerifiedPermission & IsAuthenticated])
     def change_password(self, request):
         """
         Method that allows user to change this password,
         though he has to be logged in and remember his old password.
         """
-        instance = request.user
+        # instance = request.user
         # validation of data
-        serializer = serializers.PasswordChangeSerializer(data=request.data, instance=instance)
+        # serializer = serializers.PasswordChangeSerializer(data=request.data, instance=instance)
+        serializer = self.get_serializer(data=request.data, instance=request.user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        content = {'message': 'Password has been updated successfully'}
+        content = {'message': _('Password has been updated successfully')}
         return Response(content, status=status.HTTP_200_OK)
