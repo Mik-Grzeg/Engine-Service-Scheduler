@@ -1,8 +1,14 @@
-import { LOG_IN, LOG_OUT, AUTO_LOG_IN } from "../actions/userActions";
+import {
+  LOG_IN,
+  LOG_OUT,
+  AUTO_LOG_IN,
+  WRONG_LOG_IN,
+} from "../actions/userActions";
 
 const defaultState = {
-  loggedIn: false,
-  requierdEmail: "@gmail.com",
+  loggedIn: true,
+  requierdEmail: "@mail.com",
+  errorLogIn: false,
   user: {
     name: "",
     access_token: "",
@@ -12,15 +18,29 @@ const defaultState = {
 };
 
 const userReducer = (state = defaultState, action) => {
-  if (action === LOG_IN) {
-    return { ...state, loggedIn: true, user: { ...state.user } };
+  if (action.type === LOG_IN) {
+    localStorage.setItem("access", action.payload.access);
+    localStorage.setItem("refresh", action.payload.refresh);
+    return {
+      ...state,
+      loggedIn: true,
+      user: {
+        ...state.user,
+        name: action.payload.first_name,
+        access_token: action.payload.access,
+        refresh_token: action.payload.refresh,
+      },
+    };
+  }
+  if (action.type === WRONG_LOG_IN) {
+    return { ...state, loggedIn: false, errorLogIn: true, user: {} };
   }
 
-  if (action === LOG_OUT) {
+  if (action.type === LOG_OUT) {
     return { ...state, loggedIn: false, user: {} };
   }
 
-  if (action === AUTO_LOG_IN) {
+  if (action.type === AUTO_LOG_IN) {
     return { ...state, loggedIn: false, user: { ...state.user } };
   }
   return { ...state };
