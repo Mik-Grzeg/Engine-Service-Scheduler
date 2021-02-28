@@ -2,16 +2,18 @@ import react, { useEffect } from "react";
 import { connect } from "react-redux";
 import { LOG_IN, AUTO_LOG_IN } from "./actions/userActions";
 import LoginContainer from "./containers/LoginContainer";
+import MainContainer from "./containers/MainContainer";
 
-function App({ loggedIn }) {
-  useEffect(() => {
-    console.log(loggedIn);
-  }, []);
-  return <>{!loggedIn ? <LoginContainer /> : <div>nie zalogowany</div>}</>;
+function App({ loggedIn, name }) {
+  useEffect(() => {}, []);
+  return <>{!loggedIn ? <LoginContainer /> : <MainContainer />}</>;
 }
 
 const mapStateToProps = (state) => {
-  return { loggedIn: state.loggedIn };
+  return {
+    loggedIn: state.userReducer.loggedIn,
+    name: state.userReducer.user.name,
+  };
 };
 const mapDispatchToState = (dispatch) => {
   return {};

@@ -6,11 +6,11 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
-import userReducer from "./reducers/userReducer";
+import mainReducer from "./reducers/mainReducer";
 
 //import reportWebVitals from "./utils/reportWebVitals";
 
-const store = createStore(userReducer, applyMiddleware(thunk));
+const store = createStore(mainReducer, applyMiddleware(thunk));
 ReactDOM.render(
   <React.StrictMode>
     <CssBaseline />
