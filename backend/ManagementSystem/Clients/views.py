@@ -1,18 +1,15 @@
 import datetime as dt
 
-from django.utils.timezone import now
-
-from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
-from rest_framework.response import Response
-
-
 import django_filters.rest_framework
-#from rest_framework.permissions import Dja
+from django.utils.timezone import now
+from rest_framework import status
+from rest_framework.decorators import action, permission_classes
+from rest_framework.permissions import DjangoModelPermissions
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
-from . import serializers
-from . import models
+from . import models, serializers
+
 
 class CompanyViewSet(ModelViewSet):
     """Company view set"""
@@ -27,6 +24,19 @@ class CompanyViewSet(ModelViewSet):
 
         # To change
         return serializers.CompanyDetailSerializer
+
+
+class InstallationViewSet(ModelViewSet):
+    """Installation view set"""
+    queryset = models.Installation.objects.all()
+
+    serializer_class = serializers.InstallationSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = {
+        'company': ['in'],
+        'company__name': ['in', 'exact']
+        # url: company__name__in=x,y,z
+    }
 
 class EngineViewSet(ModelViewSet):
     """Engine view set"""
@@ -66,7 +76,6 @@ class EngineViewSet(ModelViewSet):
     def turn_on(self, request, pk=None):
         """Action for turning on an engine"""
         engine = self.get_object()
-        #engine.turn_on(self.get_serializer().data.get('time'))
 
         time = None
         time_iso = request.data.get('time')
