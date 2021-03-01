@@ -16,6 +16,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import { connect } from "react-redux";
+import CompanyContainer from "./CompanyContainer";
 
 const drawerWidth = 240;
 
@@ -196,19 +197,19 @@ const MainContainer = ({ userName = "" }) => {
         <List>
           <ListItem button>
             <ListItemIcon>
-              <BsFillCalendarFill className={classes.icon} />
+              <BsFillCalendarFill className="icon" className={classes.icon} />
             </ListItemIcon>
             <ListItemText primary={"Calendar"} />
           </ListItem>
           <ListItem button>
             <ListItemIcon>
-              <GiFactory className={classes.icon} />
+              <GiFactory className="icon" className={classes.icon} />
             </ListItemIcon>
             <ListItemText primary={"Company"} />
           </ListItem>
           <ListItem button>
             <ListItemIcon>
-              <FaFileInvoiceDollar className={classes.icon} />
+              <FaFileInvoiceDollar className="icon" className={classes.icon} />
             </ListItemIcon>
             <ListItemText primary={"Budget"} />
           </ListItem>
@@ -216,6 +217,7 @@ const MainContainer = ({ userName = "" }) => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
+        <CompanyContainer />
       </main>
     </div>
   );
