@@ -1,0 +1,11 @@
+.icon {
+  margin-left: 6px;
+  font-size: 1.6rem;
+}
+
+@media (max-width: 600px) {
+  .icon {
+    margin-left: -1.5px;
+    font-size: 1.6rem;
+  }
+}

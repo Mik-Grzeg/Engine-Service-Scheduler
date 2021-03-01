@@ -9,42 +9,11 @@ export const AUTO_LOG_IN = "AUTO_LOG_IN";
 
 const logIn = (payload) => ({ type: LOG_IN, payload });
 const wrongLogIn = (payload) => ({ type: WRONG_LOG_IN, payload });
-
-export const logOut = () => ({ type: LOG_OUT });
+const logOut = () => ({ type: LOG_OUT });
 
 // Methods
 
 export const fetchUser = (userInfo) => (dispatch) => {
-  var error = false;
-  /*
-  fetch(`${loginapi}api/auth/login/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ...userInfo }),
-  })
-    .then((res) => {
-      console.log(res.status);
-      if (res.status === 200) {
-        return res.json();
-      } else {
-        error = true;
-        return Promise.reject(res);
-      }
-    })
-    .then((data) => {
-      if (!error) {
-        dispatch(logIn(data));
-      }
-    })
-    .catch(function (error) {
-      console.log(
-        "There has been a problem with your fetch operation: ",
-        error
-      );
-    });
-    */
   fetch(`${loginapi}api/auth/login/`, {
     method: "POST",
     headers: {
@@ -62,11 +31,9 @@ export const fetchUser = (userInfo) => (dispatch) => {
       //we only get here if there is no error
     })
     .then((data) => {
-      console.log("wyslane");
       dispatch(logIn(data));
     })
     .catch((err) => {
-      //console.clear();
       console.log(err);
     });
 };
@@ -83,5 +50,30 @@ export const autoLogin = () => (dispatch) => {
     .then((data) => {
       localStorage.setItem("token", data.token);
       dispatch(logIn(data.user));
+    });
+};
+
+export const postLogOut = (userInfo) => (dispatch) => {
+  fetch(`${loginapi}api/auth/logout/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...userInfo }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        dispatch(wrongLogIn());
+        throw response;
+      } else {
+        return response.json();
+      }
+      //we only get here if there is no error
+    })
+    .then((data) => {
+      dispatch(logIn(data));
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };

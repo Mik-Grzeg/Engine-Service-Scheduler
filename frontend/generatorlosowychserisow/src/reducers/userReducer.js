@@ -6,7 +6,7 @@ import {
 } from "../actions/userActions";
 
 const defaultState = {
-  loggedIn: true,
+  loggedIn: false,
   requierdEmail: "@mail.com",
   errorLogIn: false,
   user: {

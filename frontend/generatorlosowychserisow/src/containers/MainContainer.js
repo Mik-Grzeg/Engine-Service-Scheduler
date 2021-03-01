@@ -17,8 +17,9 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import { connect } from "react-redux";
 import CompanyContainer from "./CompanyContainer";
+import "./MainContainer.scss";
 
-const drawerWidth = 240;
+const drawerWidth = 220;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -105,9 +106,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MainContainer = ({ userName = "" }) => {
-  {
-    console.log(userName);
-  }
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -197,19 +195,19 @@ const MainContainer = ({ userName = "" }) => {
         <List>
           <ListItem button>
             <ListItemIcon>
-              <BsFillCalendarFill className="icon" className={classes.icon} />
+              <BsFillCalendarFill className={classes.icon} className="icon" />
             </ListItemIcon>
             <ListItemText primary={"Calendar"} />
           </ListItem>
           <ListItem button>
             <ListItemIcon>
-              <GiFactory className="icon" className={classes.icon} />
+              <GiFactory className={classes.icon} className="icon" />
             </ListItemIcon>
             <ListItemText primary={"Company"} />
           </ListItem>
           <ListItem button>
             <ListItemIcon>
-              <FaFileInvoiceDollar className="icon" className={classes.icon} />
+              <FaFileInvoiceDollar className={classes.icon} className="icon" />
             </ListItemIcon>
             <ListItemText primary={"Budget"} />
           </ListItem>
