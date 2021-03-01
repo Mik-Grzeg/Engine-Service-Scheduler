@@ -12,6 +12,8 @@ export const CompanyContainer = ({
   companyList,
   fetchCompanyList,
   fetchCompanyById,
+  isCompanyDowloaded,
+  company,
 }) => {
   const [value, setValue] = useState(null);
   const [inputValue, setInputValue] = useState("");
@@ -22,7 +24,6 @@ export const CompanyContainer = ({
 
   useEffect(() => {
     if (value !== null) {
-      console.log(value.id);
       fetchCompanyById(value.id);
     }
   }, [value]);
@@ -57,7 +58,11 @@ export const CompanyContainer = ({
           </Grid>
         </Grid>
         <Grid container direction="column" justify="center" alignItems="center">
-          <Grid item> jestem danymi firm i ciane sie na sam dol </Grid>
+          {isCompanyDowloaded && <Grid item> jestem placecholderem </Grid>}
+          {console.log(company)}
+          {!isCompanyDowloaded && (
+            <Grid item> jestem danymi firm i ciane sie na sam dol </Grid>
+          )}
         </Grid>
       </div>
     </Container>
@@ -66,6 +71,8 @@ export const CompanyContainer = ({
 
 const mapStateToProps = (state) => ({
   companyList: state.companyReducer.companyList,
+  isCompanyDowloaded: state.companyReducer.isCompanyDowloaded,
+  company: state.companyReducer.company,
 });
 const mapDispatchToProps = (dispatch) => {
   return {

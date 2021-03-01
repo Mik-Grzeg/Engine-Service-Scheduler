@@ -39,12 +39,13 @@ export const fetchUser = (userInfo) => (dispatch) => {
 };
 
 export const autoLogin = () => (dispatch) => {
-  fetch(`${loginapi}api/auth/login/`, {
+  fetch(`${loginapi}api/auth/token/verify/`, {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
+    body: JSON.stringify(`Bearer ${localStorage.getItem("token")}`),
   })
     .then((res) => res.json())
     .then((data) => {

@@ -30,7 +30,6 @@ export const fetchCompanyList = () => (dispatch) => {
 };
 
 export const fetchCompanyById = (id) => (dispatch) => {
-  console.log(id, 1);
   fetch(`${loginapi}api/client/company/${id}/`, {
     method: "GET",
     headers: {
@@ -46,7 +45,6 @@ export const fetchCompanyById = (id) => (dispatch) => {
       }
     })
     .then((data) => {
-      console.log(data);
       dispatch(downloadCompany(data));
     })
     .catch((err) => {

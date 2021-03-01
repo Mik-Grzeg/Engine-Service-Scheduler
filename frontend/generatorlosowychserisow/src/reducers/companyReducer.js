@@ -26,13 +26,21 @@ const companyReduser = (state = defaultState, action) => {
       company: {
         ...state.company,
         name: action.payload.name,
-        contant: action.payload.contant,
-        installation_set: [
-          {
-            ...state.company.installation_set,
-            installation_name: action.payload.installation_set,
-          },
-        ],
+        contact: action.payload.contact,
+        installation_set: action.payload.installation_set.map((item) => {
+          return {
+            installation_name: item.installation_name,
+            installation_location: item.installation_location,
+            engine: item.engine,
+            contract_set: item.contract_set.map((contract) => {
+              return {
+                id: contract.id,
+                contract_start: contract.contract_start,
+                contract_end: contract.contract_end,
+              };
+            }),
+          };
+        }),
       },
     };
   }
