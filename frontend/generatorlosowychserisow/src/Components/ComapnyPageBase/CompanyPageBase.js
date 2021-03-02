@@ -1,6 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import Grid from "@material-ui/core/Grid";
+import Skeleton from "@material-ui/lab/Skeleton";
+
+//TO DO SKELETON OF CARDS
 
 export const CompanyPageBase = (props) => {
   return (
@@ -19,6 +22,6 @@ export const CompanyPageBase = (props) => {
 
 const mapStateToProps = (state) => ({});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = (dispatch) => {};
 
 export default connect(mapStateToProps, mapDispatchToProps)(CompanyPageBase);

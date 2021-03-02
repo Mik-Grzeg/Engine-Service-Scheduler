@@ -6,11 +6,11 @@ const defaultState = {
     { name: "cos tam 2", id: 2 },
     { name: "cos tam 3", id: 3 },
   ],
-  isCompanyDowloaded: false,
+  isCompanyDowloaded: true,
   company: {
     name: "NAME",
     contact: "+48000000000",
-    installation_set: [{ installation_name: "installation_name 1" }],
+    installation_set: [],
   },
 };
 
@@ -49,8 +49,7 @@ const companyReduser = (state = defaultState, action) => {
 
 export default companyReduser;
 
-{
-  /*export function rootLevelReducer(state, action){
+/*export function rootLevelReducer(state, action){
     return {
         ...state,
         firstLevel: {
@@ -65,4 +64,3 @@ export default companyReduser;
         }
     }
 } */
-}

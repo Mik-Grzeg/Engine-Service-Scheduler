@@ -28,7 +28,10 @@ export const CompanyContainer = ({
     }
   }, [value]);
   return (
-    <Container maxWidth={false}>
+    <Container
+      maxWidth={false}
+      style={{ marginTop: "10px", paddingLeft: "8px", paddingRight: "8px" }}
+    >
       <div className="backgroundCompany">
         <Grid
           container
@@ -57,11 +60,23 @@ export const CompanyContainer = ({
             />
           </Grid>
         </Grid>
-        <Grid container direction="column" justify="center" alignItems="center">
-          {isCompanyDowloaded && <Grid item> jestem placecholderem </Grid>}
-          {console.log(company)}
+        <Grid
+          container
+          direction="column"
+          justify="flex-start"
+          alignItems="stretch"
+        >
+          {isCompanyDowloaded && (
+            <Grid item>
+              {" "}
+              <CompanyPage />
+            </Grid>
+          )}
           {!isCompanyDowloaded && (
-            <Grid item> jestem danymi firm i ciane sie na sam dol </Grid>
+            <Grid item>
+              {" "}
+              <CompanyPageBase />{" "}
+            </Grid>
           )}
         </Grid>
       </div>
@@ -72,7 +87,6 @@ export const CompanyContainer = ({
 const mapStateToProps = (state) => ({
   companyList: state.companyReducer.companyList,
   isCompanyDowloaded: state.companyReducer.isCompanyDowloaded,
-  company: state.companyReducer.company,
 });
 const mapDispatchToProps = (dispatch) => {
   return {

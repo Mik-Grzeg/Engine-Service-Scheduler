@@ -42,3 +42,6 @@ __pycache__/
 *.pyc
 .eslintcache
 Start.docx
+
+#api
+userApi.js
