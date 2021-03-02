@@ -12,13 +12,15 @@ import { MdChevronLeft, MdMenu } from "react-icons/md";
 import { BsFillCalendarFill } from "react-icons/bs";
 import { GiFactory } from "react-icons/gi";
 import { FaFileInvoiceDollar } from "react-icons/fa";
+import { FiLogOut } from "react-icons/fi";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import { connect } from "react-redux";
 import CompanyContainer from "./CompanyContainer";
 import "./MainContainer.scss";
-
+import { Button } from "@material-ui/core";
+import { logOut } from "../actions/userActions";
 const drawerWidth = 220;
 
 const useStyles = makeStyles((theme) => ({
@@ -79,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(0),
   },
   toolbartext: {
     flexGrow: 1,
@@ -105,7 +107,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MainContainer = ({ userName = "" }) => {
+const MainContainer = ({ userName = "", logOut }) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -170,6 +172,13 @@ const MainContainer = ({ userName = "" }) => {
             className={classes.toolbartext}
           >
             Welcome {userName}
+            <Button
+              color="default"
+              endIcon={<FiLogOut />}
+              onClick={() => {
+                logOut();
+              }}
+            ></Button>
           </Typography>
         </Toolbar>
       </AppBar>
@@ -228,7 +237,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {};
+  return {
+    logOut: () => dispatch(logOut()),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainContainer);

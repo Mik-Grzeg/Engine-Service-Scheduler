@@ -9,7 +9,7 @@ export const AUTO_LOG_IN = "AUTO_LOG_IN";
 
 const logIn = (payload) => ({ type: LOG_IN, payload });
 const wrongLogIn = (payload) => ({ type: WRONG_LOG_IN, payload });
-const logOut = () => ({ type: LOG_OUT });
+export const logOut = () => ({ type: LOG_OUT });
 
 // Methods
 
@@ -51,30 +51,5 @@ export const autoLogin = () => (dispatch) => {
     .then((data) => {
       localStorage.setItem("token", data.token);
       dispatch(logIn(data.user));
-    });
-};
-
-export const postLogOut = (userInfo) => (dispatch) => {
-  fetch(`${loginapi}api/auth/logout/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ...userInfo }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        dispatch(wrongLogIn());
-        throw response;
-      } else {
-        return response.json();
-      }
-      //we only get here if there is no error
-    })
-    .then((data) => {
-      dispatch(logIn(data));
-    })
-    .catch((err) => {
-      console.log(err);
     });
 };

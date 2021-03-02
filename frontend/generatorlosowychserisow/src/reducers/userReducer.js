@@ -6,11 +6,11 @@ import {
 } from "../actions/userActions";
 
 const defaultState = {
-  loggedIn: false,
+  loggedIn: true,
   requierdEmail: "@mail.com",
   errorLogIn: false,
   user: {
-    name: "",
+    name: "user_testowy",
     access_token: "",
     refresh_token: "",
     permison: 0,
@@ -37,11 +37,14 @@ const userReducer = (state = defaultState, action) => {
   }
 
   if (action.type === LOG_OUT) {
+    console.log("eyy");
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
     return { ...state, loggedIn: false, user: {} };
   }
 
   if (action.type === AUTO_LOG_IN) {
-    return { ...state, loggedIn: false, user: { ...state.user } };
+    return { ...state, loggedIn: true, user: { ...state.user } };
   }
   return { ...state };
 };
