@@ -1,11 +1,16 @@
 import { loginapi } from "../api/userApi";
-
+// Redux Variables
 export const DOWNLOAD_LIST = "DOWNLOAD_LIST";
 export const DOWNLOAD_COMPANY = "DOWNLOAD_COMPANY";
 
 const dowloadList = (payload) => ({ type: DOWNLOAD_LIST, payload });
 const downloadCompany = (payload) => ({ type: DOWNLOAD_COMPANY, payload });
 
+// Methods
+
+// Function do fetch list of all companies in data base
+// this list is stored in redux store
+// Format [{id,name}]
 export const fetchCompanyList = () => (dispatch) => {
   fetch(`${loginapi}api/client/company/`, {
     method: "GET",
@@ -28,7 +33,9 @@ export const fetchCompanyList = () => (dispatch) => {
       console.log(err);
     });
 };
-
+// Function to fetch i commpany chosen from the list
+// it takes id of company to get all data about it
+// format {name,contact,installation_set {installatuion_name , installation_location , engine contract_set{ id ,contract_start ,contract_end} }}
 export const fetchCompanyById = (id) => (dispatch) => {
   fetch(`${loginapi}api/client/company/${id}/`, {
     method: "GET",

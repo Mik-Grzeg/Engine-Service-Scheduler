@@ -13,20 +13,24 @@ const logIn = (payload) => ({ type: LOG_IN, payload });
 const autoLogIn = () => ({ type: AUTO_LOG_IN });
 const setUser = (payload) => ({ type: SET_USER, payload });
 const wrongLogIn = (payload) => ({ type: WRONG_LOG_IN, payload });
+
+// Methods
+
+//Removes access and refresh tokens from memory
 export const logOut = () => ({ type: LOG_OUT });
 
+// After Looginng in function send access token to get basic info about user
+// Name Email Groups and Permison and set them in store
 export const fetchUserData = () => (dispatch) => {
-  console.log("fetch user data");
   fetch(`${loginapi}api/auth/user/me/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json",
       Authorization: `Bearer ${localStorage.getItem("access")}`,
     },
   })
-    .then((res) => {
-      return res.json();
+    .then((response) => {
+      return response.json();
     })
     .then((data) => {
       console.log(data);
@@ -37,8 +41,9 @@ export const fetchUserData = () => (dispatch) => {
     });
 };
 
-// Methods
-
+// Funcion to log user into the system
+// It takes email and password as json data ]
+// It dispatches Access and Refresh Token
 export const fetchUser = (userInfo) => (dispatch) => {
   fetch(`${loginapi}api/auth/login/`, {
     method: "POST",
@@ -63,6 +68,9 @@ export const fetchUser = (userInfo) => (dispatch) => {
     });
 };
 
+// Functiopn to log user into a system if the access token is already in memory
+// It dispaches a change of status to logged in
+// if the token is invalid or expired it removes it from local memory
 export const autoLogin = () => (dispatch) => {
   const token = { token: localStorage.getItem("access") };
   fetch(`${loginapi}api/auth/token/verify/`, {
@@ -76,8 +84,7 @@ export const autoLogin = () => (dispatch) => {
     if (res.ok) {
       dispatch(autoLogIn());
     } else {
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
+      dispatch(logOut());
     }
   });
 };

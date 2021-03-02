@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 //@MATERIAL UI COMPONENTS
 import Drawer from "@material-ui/core/Drawer";
@@ -21,7 +21,7 @@ import { FiLogOut } from "react-icons/fi";
 //CONTAINERS
 import CompanyContainer from "./CompanyContainer";
 //ACTIONS
-import { logOut } from "../actions/userActions";
+import { logOut, fetchUserData } from "../actions/userActions";
 //STYTLING
 import "./MainContainer.scss";
 import clsx from "clsx";
@@ -113,7 +113,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MainContainer = ({ userName = "", logOut }) => {
+const MainContainer = ({ userName = "", logOut, fetchUserData }) => {
+  useEffect(() => {
+    fetchUserData();
+  }, []);
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const handleDrawerOpen = () => {
@@ -210,13 +213,14 @@ const MainContainer = ({ userName = "", logOut }) => {
 
 const mapStateToProps = (state) => {
   return {
-    userName: state.userReducer.user.name,
+    userName: state.userReducer.user.first_name,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     logOut: () => dispatch(logOut()),
+    fetchUserData: () => dispatch(fetchUserData()),
   };
 };
 
