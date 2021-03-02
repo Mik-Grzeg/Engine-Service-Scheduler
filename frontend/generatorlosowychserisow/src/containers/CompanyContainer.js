@@ -13,7 +13,6 @@ export const CompanyContainer = ({
   fetchCompanyList,
   fetchCompanyById,
   isCompanyDowloaded,
-  company,
 }) => {
   const [value, setValue] = useState(null);
   const [inputValue, setInputValue] = useState("");

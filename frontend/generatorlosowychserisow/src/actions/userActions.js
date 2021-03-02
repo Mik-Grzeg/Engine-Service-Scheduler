@@ -1,5 +1,6 @@
 import { loginapi } from "../api/userApi";
 
+//ACTION SEND TO REDUX
 export const LOG_IN = "LOG_IN";
 export const WRONG_LOG_IN = "WRONG_LOG_IN";
 export const LOG_OUT = "LOG_OUT";
@@ -39,7 +40,9 @@ export const fetchUser = (userInfo) => (dispatch) => {
 };
 
 export const autoLogin = () => (dispatch) => {
+  console.log("proba autologin");
   fetch(`${loginapi}api/auth/token/verify/`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -49,7 +52,6 @@ export const autoLogin = () => (dispatch) => {
   })
     .then((res) => res.json())
     .then((data) => {
-      localStorage.setItem("token", data.token);
       dispatch(logIn(data.user));
     });
 };

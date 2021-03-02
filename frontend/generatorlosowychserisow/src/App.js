@@ -1,11 +1,13 @@
 import react, { useEffect } from "react";
 import { connect } from "react-redux";
-import { LOG_IN, AUTO_LOG_IN } from "./actions/userActions";
+import { autoLogin } from "./actions/userActions";
 import LoginContainer from "./containers/LoginContainer";
 import MainContainer from "./containers/MainContainer";
 
-function App({ loggedIn, name }) {
-  useEffect(() => {}, []);
+function App({ loggedIn, name, autoLogin }) {
+  useEffect(() => {
+    autoLogin();
+  }, []);
   return <>{!loggedIn ? <LoginContainer /> : <MainContainer />}</>;
 }
 
@@ -16,7 +18,9 @@ const mapStateToProps = (state) => {
   };
 };
 const mapDispatchToState = (dispatch) => {
-  return {};
+  return {
+    autoLogin: () => dispatch(autoLogin()),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToState)(App);

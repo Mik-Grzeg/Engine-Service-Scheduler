@@ -1,28 +1,34 @@
-import React from "react";
-import clsx from "clsx";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import React, { useState } from "react";
+import { connect } from "react-redux";
+//@MATERIAL UI COMPONENTS
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
+import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+//REACT ICONS
 import { MdChevronLeft, MdMenu } from "react-icons/md";
 import { BsFillCalendarFill } from "react-icons/bs";
 import { GiFactory } from "react-icons/gi";
 import { FaFileInvoiceDollar } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import { connect } from "react-redux";
+//CONTAINERS
 import CompanyContainer from "./CompanyContainer";
-import "./MainContainer.scss";
-import { Button } from "@material-ui/core";
+//ACTIONS
 import { logOut } from "../actions/userActions";
-const drawerWidth = 220;
+//STYTLING
+import "./MainContainer.scss";
+import clsx from "clsx";
+import { makeStyles } from "@material-ui/core/styles";
 
+const drawerWidth = 220;
+//important STUFF FROM MATERIAL UI
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -109,42 +115,14 @@ const useStyles = makeStyles((theme) => ({
 
 const MainContainer = ({ userName = "", logOut }) => {
   const classes = useStyles();
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-
+  const [open, setOpen] = useState(false);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
   const handleDrawerClose = () => {
     setOpen(false);
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const menuId = "primary-search-account-menu";
-  const mobileMenuId = "primary-search-account-menu-mobile";
   return (
     <div className={classes.root}>
       <AppBar
