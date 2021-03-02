@@ -8,7 +8,7 @@ const defaultState = {
   ],
   isCompanyDowloaded: true,
   company: {
-    name: "NAME",
+    name: "COMAPNY_NAME",
     contact: "+48000000000",
     installation_set: [],
   },

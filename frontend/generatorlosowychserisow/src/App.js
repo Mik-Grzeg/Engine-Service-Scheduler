@@ -6,7 +6,9 @@ import MainContainer from "./containers/MainContainer";
 
 function App({ loggedIn, name, autoLogin }) {
   useEffect(() => {
-    autoLogin();
+    if (localStorage.getItem("access") !== null) {
+      autoLogin();
+    }
   }, []);
   return <>{!loggedIn ? <LoginContainer /> : <MainContainer />}</>;
 }

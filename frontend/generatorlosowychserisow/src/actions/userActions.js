@@ -2,6 +2,7 @@ import { loginapi } from "../api/userApi";
 
 //ACTION SEND TO REDUX
 export const LOG_IN = "LOG_IN";
+export const SET_USER = "SET_USER";
 export const WRONG_LOG_IN = "WRONG_LOG_IN";
 export const LOG_OUT = "LOG_OUT";
 export const AUTO_LOG_IN = "AUTO_LOG_IN";
@@ -9,8 +10,32 @@ export const AUTO_LOG_IN = "AUTO_LOG_IN";
 // Action Creators
 
 const logIn = (payload) => ({ type: LOG_IN, payload });
+const autoLogIn = () => ({ type: AUTO_LOG_IN });
+const setUser = (payload) => ({ type: SET_USER, payload });
 const wrongLogIn = (payload) => ({ type: WRONG_LOG_IN, payload });
 export const logOut = () => ({ type: LOG_OUT });
+
+export const fetchUserData = () => (dispatch) => {
+  console.log("fetch user data");
+  fetch(`${loginapi}api/auth/user/me/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access")}`,
+    },
+  })
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      console.log(data);
+      dispatch(setUser(data));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 // Methods
 
@@ -29,7 +54,6 @@ export const fetchUser = (userInfo) => (dispatch) => {
       } else {
         return response.json();
       }
-      //we only get here if there is no error
     })
     .then((data) => {
       dispatch(logIn(data));
@@ -40,18 +64,20 @@ export const fetchUser = (userInfo) => (dispatch) => {
 };
 
 export const autoLogin = () => (dispatch) => {
-  console.log("proba autologin");
+  const token = { token: localStorage.getItem("access") };
   fetch(`${loginapi}api/auth/token/verify/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      //Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    body: JSON.stringify(`Bearer ${localStorage.getItem("token")}`),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      dispatch(logIn(data.user));
-    });
+    body: JSON.stringify({ ...token }),
+  }).then((res) => {
+    if (res.ok) {
+      dispatch(autoLogIn());
+    } else {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+    }
+  });
 };
