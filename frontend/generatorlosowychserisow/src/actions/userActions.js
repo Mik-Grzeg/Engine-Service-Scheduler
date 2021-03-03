@@ -17,6 +17,7 @@ const wrongLogIn = (payload) => ({ type: WRONG_LOG_IN, payload });
 // Methods
 
 //Removes access and refresh tokens from memory
+//set user statuis to notLoggedIn
 export const logOut = () => ({ type: LOG_OUT });
 
 // After Looginng in function send access token to get basic info about user
@@ -33,7 +34,6 @@ export const fetchUserData = () => (dispatch) => {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       dispatch(setUser(data));
     })
     .catch((err) => {

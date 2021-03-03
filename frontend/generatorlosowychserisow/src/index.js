@@ -12,12 +12,12 @@ import mainReducer from "./reducers/mainReducer";
 
 const store = createStore(mainReducer, applyMiddleware(thunk));
 ReactDOM.render(
-  <React.StrictMode>
+  <>
     <CssBaseline />
     <Provider store={store}>
       <App />
     </Provider>
-  </React.StrictMode>,
+  </>,
   document.getElementById("root")
 );
 
