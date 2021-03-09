@@ -2,11 +2,12 @@ import { DOWNLOAD_LIST, DOWNLOAD_COMPANY } from "../actions/companyActions";
 
 const defaultState = {
   companyList: [
-    { name: "cos tam 1", id: 1 },
+    { name: "COMAPNY_NAME", id: 1 },
     { name: "cos tam 2", id: 2 },
     { name: "cos tam 3", id: 3 },
   ],
   isCompanyDowloaded: false,
+  isCompanyEdited: false,
   company: {
     name: "COMAPNY_NAME",
     contact: "+48000000000",

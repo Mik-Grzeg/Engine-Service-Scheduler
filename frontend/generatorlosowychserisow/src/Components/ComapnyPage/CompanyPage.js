@@ -27,19 +27,9 @@ export const CompanyPage = ({ company }) => {
             <Typography color="textSecondary" gutterBottom>
               COMPANY_INFO
             </Typography>
-            <Typography variant="h5" component="h2">
-              {company.name}
-            </Typography>
-            <Typography color="textSecondary">adjective</Typography>
-            <Typography variant="body2" component="p">
-              well meaning and kindly.
-              <br />
-              {'"a benevolent smile"'}
-            </Typography>
+            <Typography variant="h5">{company.name}</Typography>
+            <Typography variant="h6">{company.contact}</Typography>
           </CardContent>
-          <CardActions>
-            <Button size="small">Learn More</Button>
-          </CardActions>
         </Card>
       </Grid>
       <Grid item xs={12} md={6} xl={8}>

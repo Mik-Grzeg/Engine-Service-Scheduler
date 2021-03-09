@@ -28,15 +28,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const ComapnyCardInstallation = ({ installation }) => {
+  console.log(installation);
   if (installation.engine === null) {
     installation = {
       ...installation,
       engine: {
+        isThereEngine: false,
+        enabled: "NO DATA",
         id: "NO ID",
         serial_number: "NO SERIAL NUMBER",
         type: "NO TYPE",
         message: " NO ENGINE CONNECTED TO INSTALATION",
       },
+    };
+  }
+  if (typeof installation.contract_set === "undifiend") {
+    installation = {
+      ...installation,
+      contract_set: [],
     };
   }
 
@@ -96,46 +105,48 @@ export const ComapnyCardInstallation = ({ installation }) => {
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          Engine
-          <Typography variant="body2" color="textSecondary" component="p">
-            Serial number : {installation.engine.id}
+          <Typography variant="h6">Engine</Typography>
+          <Typography variant="body1">
+            {installation.engine.id !== "NO ID" ? (
+              <>
+                Enabled : {installation.engine.enabled ? "ON" : "OFF"}
+                <br />
+                {!installation.engine.enabled && (
+                  <>
+                    Dissabled Till : {installation.engine.stopped_till} <br />
+                  </>
+                )}
+                Serial number : {installation.engine.serial_number}
+                <br />
+                Type : {installation.engine.type}
+              </>
+            ) : (
+              <> No Engine Connected </>
+            )}
           </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
-            CONTRACTS
+          <Typography variant="h6">Contracts</Typography>
+          <Typography variant="body1">
+            {installation.contract_set.length !== 0 ? (
+              installation.contract_set.map((contract) => {
+                return (
+                  <span key={contract.id}>
+                    Start : {contract.contract_start}
+                    <br />
+                    Stop : {contract.contract_end}
+                    <br />
+                    <br />
+                  </span>
+                );
+              })
+            ) : (
+              <>No contracts conneded to this installation</>
+            )}
           </Typography>
         </CardContent>
       </Collapse>
     </Card>
   );
 };
-//{installation.engine === null ? "NO ID" : installation.engine.id}
-// TO DO  PROPTYPES FOR NULL VALUES
-
-/*
-ComapnyCardInstallation.propTypes = {
-  installation: PropTypes.shape({
-    installation_name: PropTypes.string.isRequired,
-    installation_location: PropTypes.string.isRequired,
-    engine: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      serial_number: PropTypes.string.isRequired,
-      type: PropTypes.number.isRequired,
-    }).isRequired,
-  }).isRequired,
-};
-
-ComapnyCardInstallation.defaultProps = {
-  installation: {
-    installation_name: "INSTALLATION NAME EMPTY",
-    installation_location: "INSTALLATION LOCATION EMPTY",
-    engine: {
-      id: 0,
-      serial_number: "NO SERIAL NUMBER",
-      type: 3,
-    },
-  },
-};
-*/
 
 const mapStateToProps = (state) => ({});
 

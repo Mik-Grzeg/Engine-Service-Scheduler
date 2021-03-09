@@ -1,4 +1,5 @@
 import { loginapi } from "../api/userApi";
+import { refresh } from "./userActions";
 // Redux Variables
 export const DOWNLOAD_LIST = "DOWNLOAD_LIST";
 export const DOWNLOAD_COMPANY = "DOWNLOAD_COMPANY";
@@ -30,7 +31,12 @@ export const fetchCompanyList = () => (dispatch) => {
       dispatch(dowloadList(data));
     })
     .catch((err) => {
-      console.log(err);
+      if (err.status === 401) {
+        dispatch(refresh());
+        if (localStorage.getItem("access") !== null) {
+          dispatch(fetchCompanyList);
+        }
+      }
     });
 };
 // Function to fetch i commpany chosen from the list
@@ -55,6 +61,11 @@ export const fetchCompanyById = (id) => (dispatch) => {
       dispatch(downloadCompany(data));
     })
     .catch((err) => {
-      console.log(err);
+      if (err.status === 401) {
+        dispatch(refresh());
+        if (localStorage.getItem("access") !== null) {
+          dispatch(fetchCompanyById(id));
+        }
+      }
     });
 };

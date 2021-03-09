@@ -3,6 +3,7 @@ import { loginapi } from "../api/userApi";
 //ACTION SEND TO REDUX
 export const LOG_IN = "LOG_IN";
 export const SET_USER = "SET_USER";
+export const REFRESH = "REFRESH";
 export const WRONG_LOG_IN = "WRONG_LOG_IN";
 export const LOG_OUT = "LOG_OUT";
 export const AUTO_LOG_IN = "AUTO_LOG_IN";
@@ -10,6 +11,7 @@ export const AUTO_LOG_IN = "AUTO_LOG_IN";
 // Action Creators
 
 const logIn = (payload) => ({ type: LOG_IN, payload });
+const refreshToken = (payload) => ({ type: REFRESH, payload });
 const autoLogIn = () => ({ type: AUTO_LOG_IN });
 const setUser = (payload) => ({ type: SET_USER, payload });
 const wrongLogIn = (payload) => ({ type: WRONG_LOG_IN, payload });
@@ -19,6 +21,31 @@ const wrongLogIn = (payload) => ({ type: WRONG_LOG_IN, payload });
 //Removes access and refresh tokens from memory
 //set user statuis to notLoggedIn
 export const logOut = () => ({ type: LOG_OUT });
+
+export const refresh = () => (dispatch) => {
+  const token = { refresh: localStorage.getItem("refresh") };
+  fetch(`${loginapi}api/auth/token/refresh/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...token }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        dispatch(logOut());
+        throw response;
+      } else {
+        return response.json();
+      }
+    })
+    .then((data) => {
+      dispatch(refreshToken(data));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 // After Looginng in function send access token to get basic info about user
 // Name Email Groups and Permison and set them in store
@@ -37,7 +64,12 @@ export const fetchUserData = () => (dispatch) => {
       dispatch(setUser(data));
     })
     .catch((err) => {
-      console.log(err);
+      if (err.status === 401) {
+        dispatch(refresh());
+        if (localStorage.getItem("access") !== null) {
+          dispatch(fetchUserData);
+        }
+      }
     });
 };
 

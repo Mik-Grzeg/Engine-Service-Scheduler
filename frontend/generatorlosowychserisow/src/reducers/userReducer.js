@@ -4,6 +4,7 @@ import {
   AUTO_LOG_IN,
   WRONG_LOG_IN,
   SET_USER,
+  REFRESH,
 } from "../actions/userActions";
 
 const defaultState = {
@@ -27,6 +28,13 @@ const userReducer = (state = defaultState, action) => {
     };
   }
   //set user data to user it happends after logging in
+  if (action.type === REFRESH) {
+    localStorage.setItem("access", action.payload.access);
+    return {
+      ...state,
+    };
+  }
+
   if (action.type === SET_USER) {
     return {
       ...state,

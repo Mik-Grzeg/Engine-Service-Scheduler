@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import Container from "@material-ui/core/Container";
 import CompanyPageBase from "../Components/ComapnyPageBase/CompanyPageBase";
+import CompanyEditPage from "../Components/CompanyEditPage/ComapnyEditPage";
 import Grid from "@material-ui/core/Grid";
 import CompanyPage from "../Components/ComapnyPage/CompanyPage";
 import TextField from "@material-ui/core/TextField";
@@ -13,6 +14,7 @@ export const CompanyContainer = ({
   fetchCompanyList,
   fetchCompanyById,
   isCompanyDowloaded,
+  editMode,
 }) => {
   const [value, setValue] = useState(null);
   const [inputValue, setInputValue] = useState("");
@@ -66,10 +68,7 @@ export const CompanyContainer = ({
           alignItems="stretch"
         >
           {isCompanyDowloaded && (
-            <Grid item>
-              {" "}
-              <CompanyPage />
-            </Grid>
+            <Grid item>{!editMode ? <CompanyPage /> : <CompanyEditPage />}</Grid>
           )}
           {!isCompanyDowloaded && (
             <Grid item>
@@ -85,6 +84,7 @@ export const CompanyContainer = ({
 
 const mapStateToProps = (state) => ({
   companyList: state.companyReducer.companyList,
+  editMode: state.companyReducer.isCompanyEdited,
   isCompanyDowloaded: state.companyReducer.isCompanyDowloaded,
 });
 const mapDispatchToProps = (dispatch) => {

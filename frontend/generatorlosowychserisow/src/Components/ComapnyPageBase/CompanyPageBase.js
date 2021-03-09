@@ -13,15 +13,17 @@ export const CompanyPageBase = (props) => {
       justify="space-evenly"
       alignItems="stretch"
     >
-      <Grid item> cos tam</Grid>
-      <Grid item> cos tam</Grid>
-      <Grid item> cos tam</Grid>
+      <Grid item>
+        {" "}
+        COMAPNY PAGE BASE _ THHIS IS GHOING TO BE DISPLAYED BY DEFAULT ON
+        COMPANY CONTAINER IF USER CLICK ANNY OF COMPANIES HE WONT SEE IT
+      </Grid>
     </Grid>
   );
 };
 
 const mapStateToProps = (state) => ({});
 
-const mapDispatchToProps = (dispatch) => {};
+const mapDispatchToProps = () => {};
 
-export default connect(mapStateToProps, mapDispatchToProps)(CompanyPageBase);
+export default connect(mapStateToProps)(CompanyPageBase);
